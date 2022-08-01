@@ -17,15 +17,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.hadi.model.Rate
 
 @Composable
 fun DropDownMenu(
     modifier: Modifier = Modifier,
-    selectedItem: String,
-    items: List<String>,
-    onItemSelected: (String) -> Unit,
+    selectedItem: Rate,
+    items: List<Rate>,
+    onItemSelected: (Rate) -> Unit,
 ) {
-    Spinner(
+    Spinner<Rate>(
         modifier = modifier,
         items = items,
         selectedItem = selectedItem,
@@ -43,7 +44,7 @@ fun DropDownMenu(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(item, style = TextStyle(fontWeight = FontWeight.Medium))
+                Text(item.label, style = TextStyle(fontWeight = FontWeight.Medium))
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = "drop down arrow"
@@ -52,7 +53,7 @@ fun DropDownMenu(
         },
         dropdownItemFactory = { value, _ ->
             Text(
-                text = value,
+                text = value.label,
                 style = MaterialTheme.typography.body1
             )
         },

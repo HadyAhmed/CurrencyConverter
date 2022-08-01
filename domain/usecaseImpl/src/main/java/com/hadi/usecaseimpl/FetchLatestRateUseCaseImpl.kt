@@ -12,7 +12,7 @@ class FetchLatestRateUseCaseImpl @Inject constructor(
     private val repository: CurrencyConverterRepository,
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : FetchLatestRateUseCase {
-    override suspend fun invoke(): LatestCurrencies = withContext(defaultDispatcher) {
-        repository.fetchCurrencyRates()
+    override suspend fun invoke(base: String?): LatestCurrencies = withContext(defaultDispatcher) {
+        repository.fetchCurrencyRates(base = base)
     }
 }

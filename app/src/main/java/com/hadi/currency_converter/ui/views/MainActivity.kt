@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -41,17 +42,28 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MainScreenContent(modifier: Modifier = Modifier, onDetailsClick: () -> Unit) {
+        val currencies = viewModel.viewState.collectAsState()
         Column(
-            modifier = modifier
-                .padding(top = 64.dp)
-                .padding(horizontal = 32.dp),
+            modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            SwitchCurrency(modifier = Modifier.fillMaxWidth())
+            AnimatedVisibility(
+                modifier = Modifier.fillMaxWidth(),
+                visible = currencies.value.loading
+            ) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
+            SwitchCurrency(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 64.dp)
+                    .padding(horizontal = 32.dp)
+            )
             ConvertCurrencyValues(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
+                    .padding(horizontal = 32.dp)
             )
             OutlinedButton(
                 modifier = Modifier.padding(top = 16.dp),
@@ -71,6 +83,7 @@ class MainActivity : ComponentActivity() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
+
             DropDownMenu(
                 modifier = Modifier.weight(1f),
                 selectedItem = currencies.value.fromValue,
@@ -87,6 +100,7 @@ class MainActivity : ComponentActivity() {
                     contentDescription = "Switch"
                 )
             }
+
             DropDownMenu(
                 modifier = Modifier.weight(1f),
                 selectedItem = currencies.value.toValue,

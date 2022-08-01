@@ -3,109 +3,21 @@ package com.hadi.network.mapper
 import com.hadi.model.LatestCurrencies
 import com.hadi.model.Rate
 import com.hadi.network.model.LatestCurrenciesApiModel
-import com.hadi.network.model.RateApiModel
+import org.json.JSONObject
 
 fun LatestCurrenciesApiModel.toDomain(): LatestCurrencies {
-    return LatestCurrencies(base = base, rateApiModel = rateApiModel.toDomain(), success = success)
+    return LatestCurrencies(
+        base = base,
+        rateApiModel = rateApiModel.convertRates(),
+        success = success
+    )
 }
 
-private fun RateApiModel.toDomain(): Rate {
-    return Rate(
-        aED = aED,
-        aFN = aFN,
-        aLL = aLL,
-        aMD = aMD,
-        aNG = aNG,
-        aOA = aOA,
-        aRS = aRS,
-        aUD = aUD,
-        aWG = aWG,
-        aZN = aZN,
-        bAM = bAM,
-        bBD = bBD,
-        bDT = bDT,
-        bGN = bGN,
-        bHD = bHD,
-        bIF = bIF,
-        bMD = bMD,
-        bND = bND,
-        bOB = bOB,
-        bRL = bRL,
-        bSD = bSD,
-        bTC = bTC,
-        bTN = bTN,
-        bWP = bWP,
-        bYN = bYN,
-        bYR = bYR,
-        bZD = bZD,
-        cAD = cAD,
-        cDF = cDF,
-        cHF = cHF,
-        cLF = cLF,
-        cLP = cLP,
-        cNY = cNY,
-        cOP = cOP,
-        cRC = cRC,
-        cUC = cUC,
-        cUP = cUP,
-        cVE = cVE,
-        cZK = cZK,
-        dJF = dJF,
-        dKK = dKK,
-        dOP = dOP,
-        dZD = dZD,
-        eGP = eGP,
-        eRN = eRN,
-        eTB = eTB,
-        eUR = eUR,
-        fJD = fJD,
-        fKP = fKP,
-        gBP = gBP,
-        gEL = gEL,
-        gHS = gHS,
-        gIP = gIP,
-        gMD = gMD,
-        gNF = gNF,
-        gTQ = gTQ,
-        gYD = gYD,
-        hKD = hKD,
-        hNL = hNL,
-        hRK = hRK,
-        hTG = hTG,
-        hUF = hUF,
-        iDR = iDR,
-        iLS = iLS,
-        iMP = iMP,
-        iNR = iNR,
-        iQD = iQD,
-        iRR = iRR,
-        iSK = iSK,
-        jEP = jEP,
-        jMD = jMD,
-        jOD = jOD,
-        jPY = jPY,
-        kES = kES,
-        kGS = kGS,
-        kHR = kHR,
-        kMF = kMF,
-        kPW = kPW,
-        kRW = kRW,
-        kWD = kWD,
-        kYD = kYD,
-        kZT = kZT,
-        lAK = lAK,
-        lBP = lBP,
-        lKR = lKR,
-        lRD = lRD,
-        lSL = lSL,
-        lTL = lTL,
-        lVL = lVL,
-        lYD = lYD,
-        mAD = mAD,
-        mDL = mDL,
-        mGA = mGA,
-        mKD = mKD,
-        mMK = mMK,
-        mNT = mNT,
-    )
+private fun Any.convertRates(): List<Rate> {
+    val rateList = mutableListOf<Rate>()
+    val jsonResponse = JSONObject(this.toString())
+    jsonResponse.keys().forEachRemaining {
+        rateList.add(Rate(it, jsonResponse.getDouble(it)))
+    }
+    return rateList
 }

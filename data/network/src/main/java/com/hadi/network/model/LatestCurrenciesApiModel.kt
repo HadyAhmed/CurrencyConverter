@@ -8,7 +8,7 @@ data class LatestCurrenciesApiModel(
     @SerializedName("date")
     val date: String,
     @SerializedName("rates")
-    val rateApiModel: RateApiModel,
+    val rateApiModel: Any,
     @SerializedName("success")
     val success: Boolean,
     @SerializedName("timestamp")

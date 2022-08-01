@@ -11,7 +11,7 @@ import javax.inject.Singleton
 class CurrencyConverterDataSourceImpl @Inject constructor(
     private val currencyApiService: CurrencyConverterApiService
 ) : CurrencyConverterDataSource {
-    override suspend fun fetchCurrencyRates(): LatestCurrencies {
-        return currencyApiService.fetchLatestRate().toDomain()
+    override suspend fun fetchCurrencyRates(base: String?): LatestCurrencies {
+        return currencyApiService.fetchLatestRate(base = base).toDomain()
     }
 }
