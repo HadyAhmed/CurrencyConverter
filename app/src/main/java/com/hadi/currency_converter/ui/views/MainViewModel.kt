@@ -28,7 +28,7 @@ class MainViewModel @Inject constructor(
     private fun fetchInitialRates() {
         viewModelScope.launch {
             val result = fetchLatestRateUseCase()
-            _viewState.update { it.copy(fromCurrencies = result, toCurrencies = result) }
+
         }
     }
 
@@ -82,5 +82,9 @@ class MainViewModel @Inject constructor(
     private fun Number.currencyFormatter(): String {
         val formatter: NumberFormat = DecimalFormat("##,###.##")
         return formatter.format(this)
+    }
+
+    companion object {
+        private const val TAG = "MainViewModel"
     }
 }

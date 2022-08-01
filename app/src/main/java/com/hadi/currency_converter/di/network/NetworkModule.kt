@@ -4,10 +4,12 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.hadi.currency_converter.BuildConfig
 import com.hadi.network.interceptor.HeaderInterceptor
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -52,13 +54,18 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit = Retrofit.Builder()
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .baseUrl(BuildConfig.API_ENDPOINT)
-        .client(okHttpClient)
-        .build()
+    fun provideRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit {
+        "application/json".toMediaType()
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.API_ENDPOINT)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addCallAdapterFactory(CoroutineCallAdapterFactory())
+            .client(okHttpClient)
+            .build()
+    }
 
     companion object {
         private const val TIME_OUT = 60L
+
     }
 }

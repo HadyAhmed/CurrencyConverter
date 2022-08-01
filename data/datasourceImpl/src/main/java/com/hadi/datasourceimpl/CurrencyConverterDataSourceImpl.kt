@@ -1,6 +1,8 @@
 package com.hadi.datasourceimpl
 
 import com.hadi.datasource.CurrencyConverterDataSource
+import com.hadi.model.LatestCurrencies
+import com.hadi.network.mapper.toDomain
 import com.hadi.network.service.CurrencyConverterApiService
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -9,7 +11,7 @@ import javax.inject.Singleton
 class CurrencyConverterDataSourceImpl @Inject constructor(
     private val currencyApiService: CurrencyConverterApiService
 ) : CurrencyConverterDataSource {
-    override suspend fun fetchCurrencyRates(): List<String> {
-        return currencyApiService.fetchLatestRate()
+    override suspend fun fetchCurrencyRates(): LatestCurrencies {
+        return currencyApiService.fetchLatestRate().toDomain()
     }
 }
