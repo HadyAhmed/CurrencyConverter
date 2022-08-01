@@ -3,13 +3,13 @@ package com.hadi.currency_converter.di.network
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.hadi.currency_converter.BuildConfig
+import com.hadi.network.adapter.NetworkResponseAdapterFactory
 import com.hadi.network.interceptor.HeaderInterceptor
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import com.hadi.resources.ResProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -32,7 +32,7 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideGson() = GsonBuilder().create()
+    fun provideGson(): Gson = GsonBuilder().create()
 
     @Singleton
     @Provides
@@ -54,18 +54,20 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit {
-        "application/json".toMediaType()
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient,
+        gson: Gson,
+        resProvider: ResProvider
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.API_ENDPOINT)
             .addConverterFactory(GsonConverterFactory.create(gson))
-            .addCallAdapterFactory(CoroutineCallAdapterFactory())
+            .addCallAdapterFactory(NetworkResponseAdapterFactory(resProvider = resProvider))
             .client(okHttpClient)
             .build()
     }
 
     companion object {
-        private const val TIME_OUT = 60L
-
+        private const val TIME_OUT = 30L
     }
 }

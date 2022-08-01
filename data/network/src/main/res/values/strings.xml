@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="no_internet_connection">Internet connection error</string>
+    <string name="an_error_occurred">An Error Occurred !</string>
+    <string name="unauthorized_error">Unauthorized, No valid API key provided.</string>
+    <string name="too_many_requests_error">Too many requests, API request limit exceeded. See section Rate Limiting for more info.</string>
+    <string name="server_error">Server Error We have failed to process your request. (You can contact us anytime)</string>
+    <string name="error_with_code">Error code %s</string>
+</resources>

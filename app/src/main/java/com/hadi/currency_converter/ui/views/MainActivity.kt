@@ -1,6 +1,7 @@
 package com.hadi.currency_converter.ui.views
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -15,11 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import com.hadi.currency_converter.R
 import com.hadi.currency_converter.ui.compose.CurrencyTextInput
 import com.hadi.currency_converter.ui.compose.DropDownMenu
 import com.hadi.currency_converter.ui.theme.CurrencyConverterTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -38,6 +42,15 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.showSnackBarMsg.onEach {
+            it?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
+        }.launchIn(lifecycleScope)
     }
 
     @Composable

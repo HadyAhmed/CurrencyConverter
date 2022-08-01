@@ -3,12 +3,11 @@ package com.hadi.currency_converter.ui.views
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hadi.currency_converter.utils.currencyFormatter
+import com.hadi.model.DataResult
 import com.hadi.model.Rate
 import com.hadi.usecase.FetchLatestRateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.floor
@@ -21,6 +20,9 @@ class MainViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(MainViewState.IDLE)
     val viewState = _viewState.asStateFlow()
 
+    private val _showSnackBarMsg = MutableSharedFlow<String?>()
+    val showSnackBarMsg = _showSnackBarMsg.asSharedFlow()
+
     init {
         fetchInitialRates()
     }
@@ -30,12 +32,15 @@ class MainViewModel @Inject constructor(
             _viewState.update { it.copy(loading = true) }
             val result = fetchLatestRateUseCase(base = base)
             _viewState.update { it.copy(loading = false) }
-            if (result.success) {
-                _viewState.update {
-                    it.copy(
-                        fromCurrencies = result.rateApiModel,
-                        toCurrencies = result.rateApiModel
-                    )
+            when (result) {
+                is DataResult.Failure -> _showSnackBarMsg.emit(result.throwable.message)
+                is DataResult.Success -> {
+                    _viewState.update {
+                        it.copy(
+                            fromCurrencies = result.data.rateApiModel,
+                            toCurrencies = result.data.rateApiModel
+                        )
+                    }
                 }
             }
         }
