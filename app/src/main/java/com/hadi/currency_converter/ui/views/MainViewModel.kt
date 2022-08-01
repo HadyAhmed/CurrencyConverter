@@ -2,14 +2,13 @@ package com.hadi.currency_converter.ui.views
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hadi.currency_converter.utils.currencyFormatter
+import com.hadi.model.DataResult
+import com.hadi.model.Rate
 import com.hadi.usecase.FetchLatestRateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.text.DecimalFormat
-import java.text.NumberFormat
 import javax.inject.Inject
 import kotlin.math.floor
 
@@ -18,25 +17,41 @@ class MainViewModel @Inject constructor(
     private val fetchLatestRateUseCase: FetchLatestRateUseCase
 ) : ViewModel() {
 
-    private val _viewState = MutableStateFlow<MainViewState>(MainViewState.IDLE)
+    private val _viewState = MutableStateFlow(MainViewState.IDLE)
     val viewState = _viewState.asStateFlow()
+
+    private val _showSnackBarMsg = MutableSharedFlow<String?>()
+    val showSnackBarMsg = _showSnackBarMsg.asSharedFlow()
 
     init {
         fetchInitialRates()
     }
 
-    private fun fetchInitialRates() {
+    private fun fetchInitialRates(base: String? = null) {
         viewModelScope.launch {
-            val result = fetchLatestRateUseCase()
-            _viewState.update { it.copy(fromCurrencies = result, toCurrencies = result) }
+            _viewState.update { it.copy(loading = true) }
+            val result = fetchLatestRateUseCase(base = base)
+            _viewState.update { it.copy(loading = false) }
+            when (result) {
+                is DataResult.Failure -> _showSnackBarMsg.emit(result.throwable.message)
+                is DataResult.Success -> {
+                    _viewState.update {
+                        it.copy(
+                            fromCurrencies = result.data.rateApiModel,
+                            toCurrencies = result.data.rateApiModel
+                        )
+                    }
+                }
+            }
         }
     }
 
-    fun selectFromValue(from: String) {
+    fun selectFromValue(from: Rate) {
         _viewState.update { it.copy(fromValue = from) }
+        fetchInitialRates(from.label)
     }
 
-    fun selectToValue(to: String) {
+    fun selectToValue(to: Rate) {
         _viewState.update { it.copy(toValue = to) }
     }
 
@@ -53,8 +68,9 @@ class MainViewModel @Inject constructor(
     private fun updateToState() {
         _viewState.update {
             it.copy(
-                toInputValue = floor(it.fromInputValue.toFloatOrNull() ?: 1f).times(18.98f)
-                    .currencyFormatter()
+                toInputValue = floor(
+                    it.fromInputValue.toFloatOrNull() ?: 1f
+                ).times(it.toValue.value).currencyFormatter()
             )
         }
     }
@@ -62,8 +78,9 @@ class MainViewModel @Inject constructor(
     private fun updateFromState() {
         _viewState.update {
             it.copy(
-                fromInputValue = floor(it.toInputValue.toFloatOrNull() ?: 1f).div(18.98f)
-                    .currencyFormatter()
+                fromInputValue = floor(
+                    it.toInputValue.toFloatOrNull() ?: 1f
+                ).div(it.fromValue.value).currencyFormatter()
             )
         }
     }
@@ -77,10 +94,5 @@ class MainViewModel @Inject constructor(
                 fromValue = it.toValue,
             )
         }
-    }
-
-    private fun Number.currencyFormatter(): String {
-        val formatter: NumberFormat = DecimalFormat("##,###.##")
-        return formatter.format(this)
     }
 }

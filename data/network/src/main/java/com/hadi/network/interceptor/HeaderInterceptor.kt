@@ -8,9 +8,8 @@ class HeaderInterceptor @Inject constructor() : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
             .newBuilder()
-            .addHeader("apikey", "3eKPD4rPmtJOatf8kLHGzaYZNfoQGYVX")
+            .addHeader("apikey", "asdasd3eKPD4rPmtJOatf8kLHGzaYZNfoQGYVX")
             .build()
-
         return chain.proceed(request)
     }
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="no_internet_connection">خطأ في الاتصال بالإنترنت</string>
+    <string name="an_error_occurred">حدث خطأ !</string>
+    <string name="unauthorized_error">غير مصرح به ، لم يتم توفير مفتاح API صالح.</string>
+    <string name="too_many_requests_error">هناك عدد كبير جدًا من الطلبات ، تم تجاوز حد طلبات واجهة برمجة التطبيقات. انظر قسم تحديد معدل لمزيد من المعلومات.</string>
+    <string name="server_error">خطأ في الخادم أخفقنا في معالجة طلبك. (يمكنك الاتصال بنا في أي وقت)</string>
+    <string name="error_with_code">خطا كود رقم %s</string>
+</resources>

@@ -1,6 +1,10 @@
 package com.hadi.datasourceimpl
 
 import com.hadi.datasource.CurrencyConverterDataSource
+import com.hadi.model.DataResult
+import com.hadi.model.LatestCurrencies
+import com.hadi.network.mapper.toDomain
+import com.hadi.network.model.NetworkResponse
 import com.hadi.network.service.CurrencyConverterApiService
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -9,7 +13,27 @@ import javax.inject.Singleton
 class CurrencyConverterDataSourceImpl @Inject constructor(
     private val currencyApiService: CurrencyConverterApiService
 ) : CurrencyConverterDataSource {
-    override suspend fun fetchCurrencyRates(): List<String> {
-        return currencyApiService.fetchLatestRate()
+
+    override suspend fun fetchCurrencyRates(base: String?): DataResult<LatestCurrencies> {
+        return try {
+            currencyApiService.fetchLatestRate(base = base).let {
+                when (it) {
+                    is NetworkResponse.ApiError -> {
+                        DataResult.Failure(Throwable(it.body))
+                    }
+                    is NetworkResponse.NetworkError -> {
+                        DataResult.Failure(RuntimeException(it.error.localizedMessage))
+                    }
+                    is NetworkResponse.Success -> {
+                        DataResult.Success(it.body.toDomain())
+                    }
+                    is NetworkResponse.UnknownError -> {
+                        DataResult.Failure(RuntimeException(it.error.localizedMessage))
+                    }
+                }
+            }
+        } catch (e: Throwable) {
+            DataResult.Failure(RuntimeException(e))
+        }
     }
 }

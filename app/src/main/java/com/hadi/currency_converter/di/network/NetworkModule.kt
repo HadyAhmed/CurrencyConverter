@@ -3,7 +3,9 @@ package com.hadi.currency_converter.di.network
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.hadi.currency_converter.BuildConfig
+import com.hadi.network.adapter.NetworkResponseAdapterFactory
 import com.hadi.network.interceptor.HeaderInterceptor
+import com.hadi.resources.ResProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,7 +32,7 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideGson() = GsonBuilder().create()
+    fun provideGson(): Gson = GsonBuilder().create()
 
     @Singleton
     @Provides
@@ -52,13 +54,20 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit = Retrofit.Builder()
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .baseUrl(BuildConfig.API_ENDPOINT)
-        .client(okHttpClient)
-        .build()
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient,
+        gson: Gson,
+        resProvider: ResProvider
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.API_ENDPOINT)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addCallAdapterFactory(NetworkResponseAdapterFactory(resProvider = resProvider))
+            .client(okHttpClient)
+            .build()
+    }
 
     companion object {
-        private const val TIME_OUT = 60L
+        private const val TIME_OUT = 30L
     }
 }
