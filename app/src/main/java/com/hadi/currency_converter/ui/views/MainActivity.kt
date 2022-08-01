@@ -103,6 +103,7 @@ class MainActivity : ComponentActivity() {
                 selectedItem = currencies.value.fromValue,
                 items = currencies.value.fromCurrencies,
                 onItemSelected = {
+                    if (it.label == currencies.value.fromValue.label) return@DropDownMenu
                     viewModel.selectFromValue(it)
                 },
             )

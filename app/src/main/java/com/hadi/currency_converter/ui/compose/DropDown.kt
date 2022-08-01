@@ -26,7 +26,7 @@ fun DropDownMenu(
     items: List<Rate>,
     onItemSelected: (Rate) -> Unit,
 ) {
-    Spinner<Rate>(
+    Spinner(
         modifier = modifier,
         items = items,
         selectedItem = selectedItem,
@@ -54,7 +54,7 @@ fun DropDownMenu(
         dropdownItemFactory = { value, _ ->
             Text(
                 text = value.label,
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.body1.copy(fontWeight = if (selectedItem.label == value.label) FontWeight.ExtraBold else FontWeight.Normal)
             )
         },
     )

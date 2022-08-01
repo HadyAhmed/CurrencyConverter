@@ -78,7 +78,8 @@ class MainViewModel @Inject constructor(
         _viewState.update {
             it.copy(
                 toInputValue = (
-                        it.fromInputValue.toFloatOrNull() ?: 1f
+                        it.fromInputValue.trim().replace(",", "").replace("،", "").toFloatOrNull()
+                            ?: 1f
                         ).times(it.toValue.value).currencyFormatter()
             )
         }
@@ -87,7 +88,9 @@ class MainViewModel @Inject constructor(
     private fun updateFromState() {
         _viewState.update {
             it.copy(
-                fromInputValue = (it.toInputValue.toFloatOrNull() ?: 1f).div(it.toValue.value)
+                fromInputValue = (it.toInputValue.trim().replace(",", "").replace("،", "")
+                    .toFloatOrNull()
+                    ?: 1f).div(it.toValue.value)
                     .currencyFormatter()
             )
         }
