@@ -10,30 +10,33 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.floor
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val fetchLatestRateUseCase: FetchLatestRateUseCase
+    private val fetchLatestRateUseCase: FetchLatestRateUseCase,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(MainViewState.IDLE)
     val viewState = _viewState.asStateFlow()
 
-    private val _showSnackBarMsg = MutableSharedFlow<String?>()
-    val showSnackBarMsg = _showSnackBarMsg.asSharedFlow()
+    private val _showToastMessage = MutableSharedFlow<String?>()
+    val showToastMessage = _showToastMessage.asSharedFlow()
 
     init {
         fetchInitialRates()
     }
 
+    /**
+     * this will update the currency rate data to change the UI values from and to
+     * @param base is the country currency code passed to the API, by default no base to fetch all country currency at the beginning
+     */
     private fun fetchInitialRates(base: String? = null) {
         viewModelScope.launch {
             _viewState.update { it.copy(loading = true) }
             val result = fetchLatestRateUseCase(base = base)
             _viewState.update { it.copy(loading = false) }
             when (result) {
-                is DataResult.Failure -> _showSnackBarMsg.emit(result.throwable.message)
+                is DataResult.Failure -> _showToastMessage.emit(result.throwable.message)
                 is DataResult.Success -> {
                     _viewState.update {
                         it.copy(
@@ -41,18 +44,24 @@ class MainViewModel @Inject constructor(
                             toCurrencies = result.data.rateApiModel
                         )
                     }
+                    selectToValue(_viewState.value.toCurrencies.find { it.label == _viewState.value.toValue.label })
                 }
             }
         }
     }
 
+
     fun selectFromValue(from: Rate) {
         _viewState.update { it.copy(fromValue = from) }
         fetchInitialRates(from.label)
+        updateFromState()
     }
 
-    fun selectToValue(to: Rate) {
-        _viewState.update { it.copy(toValue = to) }
+    fun selectToValue(to: Rate?) {
+        to?.let {
+            _viewState.update { it.copy(toValue = to) }
+            updateToState()
+        }
     }
 
     fun changeFromInputValue(from: String) {
@@ -68,9 +77,9 @@ class MainViewModel @Inject constructor(
     private fun updateToState() {
         _viewState.update {
             it.copy(
-                toInputValue = floor(
-                    it.fromInputValue.toFloatOrNull() ?: 1f
-                ).times(it.toValue.value).currencyFormatter()
+                toInputValue = (
+                        it.fromInputValue.toFloatOrNull() ?: 1f
+                        ).times(it.toValue.value).currencyFormatter()
             )
         }
     }
@@ -78,9 +87,8 @@ class MainViewModel @Inject constructor(
     private fun updateFromState() {
         _viewState.update {
             it.copy(
-                fromInputValue = floor(
-                    it.toInputValue.toFloatOrNull() ?: 1f
-                ).div(it.fromValue.value).currencyFormatter()
+                fromInputValue = (it.toInputValue.toFloatOrNull() ?: 1f).div(it.toValue.value)
+                    .currencyFormatter()
             )
         }
     }
@@ -89,10 +97,11 @@ class MainViewModel @Inject constructor(
         _viewState.update {
             it.copy(
                 toValue = it.fromValue,
+                fromValue = it.toValue,
                 toInputValue = it.fromInputValue,
                 fromInputValue = it.toInputValue,
-                fromValue = it.toValue,
             )
         }
+        fetchInitialRates(_viewState.value.fromValue.label)
     }
 }

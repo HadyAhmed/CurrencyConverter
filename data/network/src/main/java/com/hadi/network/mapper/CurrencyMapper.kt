@@ -13,6 +13,12 @@ fun LatestCurrenciesApiModel.toDomain(): LatestCurrencies {
     )
 }
 
+/**
+ * mapping response to domain object
+ * convert the json response object to list of Rate
+ * this will be helpful to use the data in the drop down menu
+ * @see Rate
+ */
 private fun Any.convertRates(): List<Rate> {
     val rateList = mutableListOf<Rate>()
     val jsonResponse = JSONObject(this.toString())

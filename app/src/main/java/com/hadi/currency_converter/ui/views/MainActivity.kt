@@ -21,6 +21,7 @@ import com.hadi.currency_converter.R
 import com.hadi.currency_converter.ui.compose.CurrencyTextInput
 import com.hadi.currency_converter.ui.compose.DropDownMenu
 import com.hadi.currency_converter.ui.theme.CurrencyConverterTheme
+import com.hadi.currency_converter.utils.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -46,7 +47,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.showSnackBarMsg.onEach {
+        viewModel.showToastMessage.onEach {
             it?.let {
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
             }
@@ -105,6 +106,7 @@ class MainActivity : ComponentActivity() {
                     viewModel.selectFromValue(it)
                 },
             )
+
             IconButton(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 onClick = { viewModel.switchSelection() }) {
@@ -113,7 +115,6 @@ class MainActivity : ComponentActivity() {
                     contentDescription = "Switch"
                 )
             }
-
             DropDownMenu(
                 modifier = Modifier.weight(1f),
                 selectedItem = currencies.value.toValue,
@@ -136,13 +137,15 @@ class MainActivity : ComponentActivity() {
             CurrencyTextInput(
                 modifier = Modifier.weight(1f),
                 value = currencies.value.fromInputValue,
-                onValueChange = viewModel::changeFromInputValue
+                onValueChange = viewModel::changeFromInputValue,
+                onDoneClick = { hideKeyboard() }
             )
             Spacer(modifier = Modifier.padding(horizontal = 8.dp))
             CurrencyTextInput(
                 modifier = Modifier.weight(1f),
                 value = currencies.value.toInputValue,
-                onValueChange = viewModel::changeToInputValue
+                onValueChange = viewModel::changeToInputValue,
+                onDoneClick = { hideKeyboard() }
             )
         }
     }
