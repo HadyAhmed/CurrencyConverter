@@ -3,7 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.hadi.currency_converter">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
+        android:name=".CurrencyConverterApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -14,7 +17,7 @@
         android:theme="@style/Theme.CurrencyConverter"
         tools:targetApi="31">
         <activity
-            android:name=".ui.screens.MainActivity"
+            android:name=".ui.views.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.CurrencyConverter">

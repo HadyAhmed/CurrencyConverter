@@ -1,16 +1,36 @@
-package com.hadi.currency_converter.ui.screens
+package com.hadi.currency_converter.ui.views
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.hadi.usecase.FetchLatestRateUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import javax.inject.Inject
 import kotlin.math.floor
 
-class MainViewModel : ViewModel() {
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val fetchLatestRateUseCase: FetchLatestRateUseCase
+) : ViewModel() {
+
     private val _viewState = MutableStateFlow<MainViewState>(MainViewState.IDLE)
     val viewState = _viewState.asStateFlow()
+
+    init {
+        fetchInitialRates()
+    }
+
+    private fun fetchInitialRates() {
+        viewModelScope.launch {
+            val result = fetchLatestRateUseCase()
+            _viewState.update { it.copy(fromCurrencies = result, toCurrencies = result) }
+        }
+    }
 
     fun selectFromValue(from: String) {
         _viewState.update { it.copy(fromValue = from) }

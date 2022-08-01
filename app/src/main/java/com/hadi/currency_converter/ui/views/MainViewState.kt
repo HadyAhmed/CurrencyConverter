@@ -1,4 +1,4 @@
-package com.hadi.currency_converter.ui.screens
+package com.hadi.currency_converter.ui.views
 
 data class MainViewState(
     val fromCurrencies: List<String> = listOf("EGP", "USD"),

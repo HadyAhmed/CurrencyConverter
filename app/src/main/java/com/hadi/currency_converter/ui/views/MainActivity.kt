@@ -1,4 +1,4 @@
-package com.hadi.currency_converter.ui.screens
+package com.hadi.currency_converter.ui.views
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,7 +18,9 @@ import com.hadi.currency_converter.R
 import com.hadi.currency_converter.ui.compose.CurrencyTextInput
 import com.hadi.currency_converter.ui.compose.DropDownMenu
 import com.hadi.currency_converter.ui.theme.CurrencyConverterTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<MainViewModel>()
 
