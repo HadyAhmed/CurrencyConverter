@@ -63,6 +63,7 @@ class HistoricalDataActivity : ComponentActivity() {
     @Composable
     private fun HistoricalDataList(modifier: Modifier = Modifier) {
         val viewState = viewModel.viewState.collectAsState()
+
         Row(modifier = modifier) {
             LazyColumn(
                 modifier = Modifier
@@ -106,7 +107,7 @@ class HistoricalDataActivity : ComponentActivity() {
                     }
                     items(viewState.value.data.rates.shuffled().subList(0, 10)) { rate ->
                         HistoricalConvertedItem(
-                            baseAmount = viewState.value.baseAmount,
+                            state = viewState.value,
                             rate = rate
                         )
                     }
@@ -150,7 +151,8 @@ class HistoricalDataActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun HistoricalConvertedItem(baseAmount: Float, rate: HistoricalRate) {
+    private fun HistoricalConvertedItem(state: HistoricalDataViewState, rate: HistoricalRate) {
+
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -166,16 +168,20 @@ class HistoricalDataActivity : ComponentActivity() {
                 Text(text = rate.label, style = MaterialTheme.typography.subtitle2)
                 Divider(modifier = Modifier.padding(vertical = 8.dp))
                 Text(
-                    text = "Start Converted Value:\n${
-                        rate.startRate.toFloat().times(baseAmount).currencyFormatter()
-                    }",
+                    text = "${state.data.startDate}:\n" +
+                            "${state.baseAmount.currencyFormatter()}${state.data.base} ⥂" +
+                            "${
+                                rate.startRate.toFloat().times(state.baseAmount).currencyFormatter()
+                            }${rate.label}",
                     style = MaterialTheme.typography.caption
                 )
                 Text(
                     modifier = Modifier.padding(vertical = 8.dp),
-                    text = "End Converted Value:\n${
-                        rate.endRate.toFloat().times(baseAmount).currencyFormatter()
-                    }",
+                    text = "${state.data.endDate}:\n" +
+                            "${state.baseAmount.currencyFormatter()}${state.data.base} ⥂ " +
+                            "${
+                                rate.endRate.toFloat().times(state.baseAmount).currencyFormatter()
+                            }${rate.label}",
                     style = MaterialTheme.typography.caption
                 )
             }

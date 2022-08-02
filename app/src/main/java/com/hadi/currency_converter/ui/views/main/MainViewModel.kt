@@ -75,6 +75,7 @@ class MainViewModel @Inject constructor(
         updateFromState()
     }
 
+    /** this will convert to input value */
     private fun updateToState() {
         _viewState.update {
             it.copy(
@@ -85,6 +86,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    /** this will convert from input value */
     private fun updateFromState() {
         _viewState.update {
             it.copy(
@@ -103,6 +105,7 @@ class MainViewModel @Inject constructor(
                 fromInputValue = it.toInputValue,
             )
         }
+        // update selected from rate after switching
         fetchInitialRates(_viewState.value.fromValue.label)
     }
 }
