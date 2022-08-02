@@ -7,3 +7,8 @@ fun Number.currencyFormatter(): String {
     val formatter: NumberFormat = DecimalFormat("###,###.##")
     return formatter.format(this)
 }
+
+fun String.convertToNumber(): Float {
+    return trim().replace(",", "").replace("،", "").toFloatOrNull()
+        ?: 1f
+}
