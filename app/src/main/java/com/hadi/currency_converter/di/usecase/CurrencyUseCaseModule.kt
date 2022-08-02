@@ -1,6 +1,8 @@
 package com.hadi.currency_converter.di.usecase
 
+import com.hadi.usecase.FetchHistoricalDataUseCase
 import com.hadi.usecase.FetchLatestRateUseCase
+import com.hadi.usecaseimpl.FetchHistoricalDataUseCaseImpl
 import com.hadi.usecaseimpl.FetchLatestRateUseCaseImpl
 import dagger.Binds
 import dagger.Module
@@ -14,4 +16,9 @@ interface CurrencyUseCaseModule {
     fun bindGetBillServicesUseCase(
         impl: FetchLatestRateUseCaseImpl
     ): FetchLatestRateUseCase
+
+    @Binds
+    fun bindFetchHistoricalDataUseCase(
+        impl: FetchHistoricalDataUseCaseImpl
+    ): FetchHistoricalDataUseCase
 }

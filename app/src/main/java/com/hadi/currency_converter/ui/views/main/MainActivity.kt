@@ -1,11 +1,13 @@
-package com.hadi.currency_converter.ui.views
+package com.hadi.currency_converter.ui.views.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -18,14 +20,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.hadi.currency_converter.R
+import com.hadi.currency_converter.ui.compose.CurrencyConverterToolbar
 import com.hadi.currency_converter.ui.compose.CurrencyTextInput
 import com.hadi.currency_converter.ui.compose.DropDownMenu
 import com.hadi.currency_converter.ui.theme.CurrencyConverterTheme
+import com.hadi.currency_converter.ui.views.historical.HistoricalDataActivity
+import com.hadi.currency_converter.ui.views.historical.HistoricalDataViewModel
+import com.hadi.currency_converter.utils.convertToNumber
+import com.hadi.currency_converter.utils.currentDate
+import com.hadi.currency_converter.utils.currentDateTime
 import com.hadi.currency_converter.utils.hideKeyboard
+import com.hadi.model.HistoricalDataRequest
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+@ExperimentalFoundationApi
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<MainViewModel>()
@@ -34,10 +44,23 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CurrencyConverterTheme {
-                Scaffold(topBar = { CurrencyConverterToolbar() }) {
+                Scaffold(topBar = { CurrencyConverterToolbar("Currency Converter") }) {
                     MainScreenContent(
-                        onDetailsClick = {
-
+                        onDetailsClick = { amount, base ->
+                            startActivity(
+                                Intent(this, HistoricalDataActivity::class.java)
+                                    .putExtra(
+                                        HistoricalDataViewModel.HISTORICAL_DATA_REQUEST,
+                                        HistoricalDataRequest(
+                                            base = base,
+                                            startDate = currentDateTime(date = currentDate(-3)),
+                                            endDate = currentDateTime(),
+                                        )
+                                    ).putExtra(
+                                        HistoricalDataViewModel.HISTORICAL_DATA_AMOUNT,
+                                        amount
+                                    )
+                            )
                         }
                     )
                 }
@@ -49,13 +72,16 @@ class MainActivity : ComponentActivity() {
         super.onStart()
         viewModel.showToastMessage.onEach {
             it?.let {
-                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
             }
         }.launchIn(lifecycleScope)
     }
 
     @Composable
-    fun MainScreenContent(modifier: Modifier = Modifier, onDetailsClick: () -> Unit) {
+    fun MainScreenContent(
+        modifier: Modifier = Modifier,
+        onDetailsClick: (amount: Float, base: String) -> Unit
+    ) {
         val currencies = viewModel.viewState.collectAsState()
         Column(
             modifier = modifier,
@@ -67,24 +93,34 @@ class MainActivity : ComponentActivity() {
             ) {
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             }
+
             SwitchCurrency(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 64.dp)
                     .padding(horizontal = 32.dp)
             )
+
             ConvertCurrencyValues(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
                     .padding(horizontal = 32.dp)
             )
-            OutlinedButton(
-                modifier = Modifier.padding(top = 16.dp),
-                shape = RoundedCornerShape(8.dp),
-                onClick = onDetailsClick
-            ) {
-                Text("Details")
+
+            AnimatedVisibility(visible = currencies.value.fromValue.label != "From" && currencies.value.toValue.label != "To") {
+                OutlinedButton(
+                    modifier = Modifier.padding(top = 16.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    onClick = {
+                        onDetailsClick(
+                            currencies.value.fromInputValue.convertToNumber(),
+                            currencies.value.fromValue.label
+                        )
+                    }
+                ) {
+                    Text("Details")
+                }
             }
         }
     }
@@ -151,19 +187,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @Composable
-    fun CurrencyConverterToolbar() {
-        TopAppBar(elevation = 8.dp) {
-            Text("Currency Converter", style = MaterialTheme.typography.h6)
-        }
-    }
-
-
     @Preview(showBackground = true, name = "Main Screen")
     @Composable
     fun DefaultPreview() {
         CurrencyConverterTheme {
-            MainScreenContent(modifier = Modifier.fillMaxSize(), onDetailsClick = {})
+            MainScreenContent(modifier = Modifier.fillMaxSize(), onDetailsClick = { _, _ -> })
         }
     }
 
@@ -171,7 +199,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun ToolbarPreview() {
         CurrencyConverterTheme {
-            CurrencyConverterToolbar()
+            CurrencyConverterToolbar("Currency Converter")
         }
     }
 

@@ -1,7 +1,8 @@
-package com.hadi.currency_converter.ui.views
+package com.hadi.currency_converter.ui.views.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hadi.currency_converter.utils.convertToNumber
 import com.hadi.currency_converter.utils.currencyFormatter
 import com.hadi.model.DataResult
 import com.hadi.model.Rate
@@ -78,8 +79,7 @@ class MainViewModel @Inject constructor(
         _viewState.update {
             it.copy(
                 toInputValue = (
-                        it.fromInputValue.trim().replace(",", "").replace("،", "").toFloatOrNull()
-                            ?: 1f
+                        it.fromInputValue.convertToNumber()
                         ).times(it.toValue.value).currencyFormatter()
             )
         }
@@ -88,9 +88,7 @@ class MainViewModel @Inject constructor(
     private fun updateFromState() {
         _viewState.update {
             it.copy(
-                fromInputValue = (it.toInputValue.trim().replace(",", "").replace("،", "")
-                    .toFloatOrNull()
-                    ?: 1f).div(it.toValue.value)
+                fromInputValue = (it.toInputValue.convertToNumber()).div(it.toValue.value)
                     .currencyFormatter()
             )
         }

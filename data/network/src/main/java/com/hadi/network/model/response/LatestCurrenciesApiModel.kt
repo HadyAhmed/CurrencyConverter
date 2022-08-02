@@ -1,4 +1,4 @@
-package com.hadi.network.model
+package com.hadi.network.model.response
 
 import com.google.gson.annotations.SerializedName
 

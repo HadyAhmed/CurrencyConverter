@@ -1,4 +1,4 @@
-package com.hadi.currency_converter.ui.views
+package com.hadi.currency_converter.ui.views.main
 
 import com.hadi.model.Rate
 

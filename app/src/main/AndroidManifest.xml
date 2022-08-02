@@ -17,7 +17,7 @@
         android:theme="@style/Theme.CurrencyConverter"
         tools:targetApi="31">
         <activity
-            android:name=".ui.views.MainActivity"
+            android:name=".ui.views.main.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.CurrencyConverter">
@@ -26,6 +26,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".ui.views.historical.HistoricalDataActivity" />
     </application>
 
 </manifest>
