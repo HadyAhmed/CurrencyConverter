@@ -21,6 +21,7 @@ internal class NetworkResponseCall<S : Any, E : Any> @Inject constructor(
     private val errorConverter: Converter<ResponseBody, E>
 ) : Call<NetworkResponse<S, E>> {
 
+    @Suppress("UNCHECKED_CAST")
     override fun enqueue(callback: Callback<NetworkResponse<S, E>>) {
         return delegate.enqueue(object : Callback<S> {
             override fun onResponse(call: Call<S>, response: Response<S>) {
